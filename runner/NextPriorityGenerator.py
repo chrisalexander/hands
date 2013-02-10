@@ -12,7 +12,7 @@ class NextPriorityGenerator:
     
     """
     
-    def __init__(self, start = 1):
+    def __init__(self, start = 1000000):
         """ Initialise the generator. """
         
         self.next = start;
@@ -22,6 +22,6 @@ class NextPriorityGenerator:
         """ Returns the next thread priority level. """
         self.lock.acquire()
         nextval = self.next
-        self.next = self.next + 1
+        self.next = self.next - 1
         self.lock.release()
         return nextval

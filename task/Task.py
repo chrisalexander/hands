@@ -2,6 +2,7 @@ from threading import Thread, Lock
 from task.CallbackExecutionException import CallbackExecutionException
 from task.TaskIdentifier import TaskIdentifier
 from task.AlreadyRunException import AlreadyRunException
+import inspect
 
 class Task:
     """ A generic task wrapper.
@@ -64,7 +65,13 @@ class Task:
         def execute(task, runner):
             # Run the method
             try:
-                res = task.method(runner)
+                args = inspect.getargspec(task.method)[0]
+                if args[0] == "self":
+                    args.pop()
+                if len(args) < 1:
+                    res = task.method()
+                else:
+                    res = task.method(runner)
                 task.successful = True
                 task.result = res
             except Exception as e:
