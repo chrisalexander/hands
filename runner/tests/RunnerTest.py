@@ -72,7 +72,7 @@ class Test(unittest.TestCase):
         r = Runner()
         
         for i in range(0, 5):
-            if i == 3:
+            if i == 2:
                 # This one will enqueue another one after it
                 j = EnqueueJob(i, 100)
                 f = j.do
@@ -84,7 +84,7 @@ class Test(unittest.TestCase):
         r.start()
         
         global executionOrder
-        self.assertEqual([0, 1, 2, 3, 100, 4, 5], executionOrder, "Execution order not correct")
+        self.assertEqual([0, 1, 2, 100, 3, 4], executionOrder, "Execution order not correct")
     
     def testStop(self):
         # TODO: Test

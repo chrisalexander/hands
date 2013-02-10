@@ -17,15 +17,15 @@ class Test(unittest.TestCase):
         r = Random()
         n = r.randint(0, 10000)
         npg = NextPriorityGenerator(n)
-        self.assertEqual(n, npg.getNextPriority(), "First result not valid")
+        self.assertEqual(n-1, npg.getNextPriority(), "First result not valid")
         for i in range(1, 10):
-            self.assertEqual(1000000-i, npg.getNextPriority(), "%sth result not valid" % i)
+            self.assertEqual(n-i-1, npg.getNextPriority(), "Result %i not valid" % i)
 
     def testThreadedUsage(self):
         r = Random()
         n = r.randint(0, 10000)
         npg = NextPriorityGenerator(n)
-        self.assertEqual(n, npg.getNextPriority(), "First result not valid")
+        self.assertEqual(n-1, npg.getNextPriority(), "First result not valid")
         
         results = {}
         threads = []
@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
         # Check all the results are right
         prev = None
         for i in range(1, 10):
-            j = 1000000 - i
+            j = n-i-1
             self.assertTrue(j in results, "Results array does not have correct key")
             if prev is not None:
                 self.assertTrue(results[j] > prev)

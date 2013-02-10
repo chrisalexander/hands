@@ -2,6 +2,7 @@ import Queue
 from runner.NextPriorityGenerator import NextPriorityGenerator
 from runner.RunExecutionException import RunExecutionException
 from runner.NoSuchTaskException import NoSuchTaskException
+from time import time
 
 class Runner:
     """ A task runner.
@@ -35,7 +36,7 @@ class Runner:
         # Try and get a task and run it
         try:
             taskset = self.queue.get(True, 2)
-            task = self.tasks[taskset[1]]
+            task = self.tasks[taskset[2]]
             task.run(self)
         except Queue.Empty as e:
             self.finished()
@@ -59,7 +60,7 @@ class Runner:
         self.running = False
         # TODO: Finish implementation
         
-    def enqueue(self, task, priority=1000000):
+    def enqueue(self, task, priority=0):
         """ Queues a task.
         
         This task will be run after all of the other ones currently in the queue.
@@ -69,7 +70,7 @@ class Runner:
         
         """
         self.tasks[task.identifier.id] = task
-        self.queue.put((priority, task.identifier.id))
+        self.queue.put((priority, time(), task.identifier.id))
         return task.identifier
     
     def simultaneously(self, tasks):
