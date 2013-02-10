@@ -1,5 +1,6 @@
 from threading import Thread
 from task.CallbackExecutionException import CallbackExecutionException
+from task.TaskIdentifier import TaskIdentifier
 
 class Task:
     """ A generic task wrapper.
@@ -26,6 +27,7 @@ class Task:
         self.error = None
         self.thread = None
         self.result = None
+        self.identifier = TaskIdentifier()
         
         # External references
         self.method = method
