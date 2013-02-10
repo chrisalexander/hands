@@ -1,0 +1,3 @@
+
+class CallbackExecutionException(Exception):
+    pass
