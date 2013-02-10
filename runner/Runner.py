@@ -37,7 +37,8 @@ class Runner:
         try:
             taskset = self.queue.get(True, 2)
             task = self.tasks[taskset[2]]
-            task.run(self)
+            if not task.cancelled:
+                task.run(self)
         except Queue.Empty as e:
             self.finished()
             return
@@ -110,8 +111,7 @@ class Runner:
         has already been run, raises an AlreadyRunException.
         
         """
-        # TODO: Implement
-        raise Exception("Not currently implemented")
+        self.tasks[taskReference.id].cancelled = True
     
     def result(self, taskReference):
         """ Gets the result of a task.

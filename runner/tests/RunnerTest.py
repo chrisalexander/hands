@@ -87,8 +87,61 @@ class Test(unittest.TestCase):
         self.assertEqual([0, 1, 2, 100, 3, 4], executionOrder, "Execution order not correct")
     
     def testStop(self):
-        # TODO: Test
-        pass
+        r = Runner()
+        j = BasicJob()
+        t = Task(j.do)
+        ref = r.enqueue(t)
+        
+        # Check the job has not been run
+        task = r.get(ref)
+        self.assertFalse(task.hasRun) 
+        
+        r.stop()
+        r.start()
+        
+        # Check the job has still not been run and the runner has been finished
+        self.assertFalse(j.run, "Job has not been run")
+        self.assertFalse(r.running, "Runner has not finished")
+        
+    def testCancel(self):
+        r = Runner()
+        j = BasicJob()
+        t = Task(j.do)
+        ref = r.enqueue(t)
+        
+        r.dequeue(ref)
+        
+        # Check the job has not been run
+        task = r.get(ref)
+        self.assertFalse(task.hasRun) 
+        
+        r.start()
+        
+        # Check the job has still not been run and the runner has been finished
+        self.assertFalse(j.run, "Job has not been run")
+        self.assertFalse(r.running, "Runner has not finished")
+        
+    def testCancelAlreadyRun(self):
+        r = Runner()
+        j = BasicJob()
+        t = Task(j.do)
+        ref = r.enqueue(t)
+        
+        # Check the job has not been run
+        task = r.get(ref)
+        self.assertFalse(task.hasRun) 
+        
+        r.start()
+        
+        # Check the job has been run and the runner has been finished
+        self.assertTrue(j.run, "Job has not been run")
+        self.assertFalse(r.running, "Runner has not finished")
+        
+        try:
+            r.dequeue(ref)
+            self.fail("Dequeue should throw exception")
+        except:
+            pass
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testBasicJobRun']

@@ -31,6 +31,7 @@ class Task:
         self.result = None
         self.identifier = TaskIdentifier()
         self.lock = Lock()
+        self.cancelled = False # No cancellation logic in the task itself
         
         # External references
         self.method = method
