@@ -1,6 +1,7 @@
-from threading import Thread
+from threading import Thread, Lock
 from task.CallbackExecutionException import CallbackExecutionException
 from task.TaskIdentifier import TaskIdentifier
+from task.AlreadyRunException import AlreadyRunException
 
 class Task:
     """ A generic task wrapper.
@@ -28,6 +29,7 @@ class Task:
         self.thread = None
         self.result = None
         self.identifier = TaskIdentifier()
+        self.lock = Lock()
         
         # External references
         self.method = method
@@ -49,15 +51,6 @@ class Task:
             return self.result
         else:
             raise self.error
-        
-    def doCallback(self):
-        """ Helper method which calls back, if provided. """
-        if callable(self.callback):
-            try:
-                self.output = self.result if self.successful else self.error
-                self.callback(self.successful, self.output)
-            except Exception as e:
-                raise CallbackExecutionException(e)
     
     def runAsync(self, runner):
         """ Run the task asynchronously.
@@ -80,10 +73,29 @@ class Task:
             finally:
                 task.hasRun = True
         
+        # Acquire the execution lock
+        self.lock.acquire()
+        
+        # Start the thread
         self.thread = Thread(target=execute, args=(self, runner))
         self.thread.setDaemon(True)
+        
+        if self.hasRun:
+            self.lock.release()
+            raise AlreadyRunException()
+        
         self.thread.start()
+        self.lock.release()
         return self.thread
+
+    def doCallback(self):
+        """ Helper method which calls back, if provided. """
+        if callable(self.callback):
+            try:
+                self.output = self.result if self.successful else self.error
+                self.callback(self.successful, self.output)
+            except Exception as e:
+                raise CallbackExecutionException(e)
 
     def simultaneously(self, task):
         """ Add a task to this one, to be run simultaneously.
